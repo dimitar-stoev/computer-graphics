@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <title>Щриховане на многоъгълник</title>
+  <style>
+    canvas { border: 1px solid black; }
+  </style>
+</head>
+<body>
+
+<h2>Щракнете върху платното, за да зададете върховете на многоъгълника. Натиснете "Завърши", за да щриховате.</h2>
+<canvas id="canvas" width="600" height="400"></canvas><br>
+<button onclick="finishPolygon()">Завърши</button>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let polygon = [];
+let isFinished = false;
+
+// Добавяне на върхове чрез клик
+canvas.addEventListener("click", function(event) {
+  if (isFinished) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  polygon.push({x, y});
+  drawPolygon();
+});
+
+// Рисуване на многоъгълника
+function drawPolygon() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (polygon.length === 0) return;
+
+  ctx.beginPath();
+  ctx.moveTo(polygon[0].x, polygon[0].y);
+  for (let i = 1; i < polygon.length; i++) {
+    ctx.lineTo(polygon[i].x, polygon[i].y);
+  }
+  ctx.stroke();
+
+  // Нарисувай точки
+  for (let p of polygon) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+}
+
+// Завършване на многоъгълника и щриховане
+function finishPolygon() {
+  if (polygon.length < 3) return;
+  isFinished = true;
+
+  // Затвори многоъгълника
+  polygon.push(polygon[0]);
+  drawPolygon();
+  hatchPolygon();
+}
+
+// Алгоритъм за щриховане с линии успоредни на оста Х
+function hatchPolygon() {
+  const spacing = 10;
+  for (let y = 0; y <= canvas.height; y += spacing) {
+    let intersections = [];
+
+    // Намери пресечни точки с хоризонталата y
+    for (let i = 0; i < polygon.length - 1; i++) {
+      const p1 = polygon[i];
+      const p2 = polygon[i + 1];
+
+      if ((p1.y <= y && p2.y > y) || (p2.y <= y && p1.y > y)) {
+        // Пресичане
+        const x = p1.x + (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
+        intersections.push(x);
+      }
+    }
+
+    // Сортиране чрез bubble sort
+    bubbleSort(intersections);
+
+    // Рисуване на хоризонтални щрихи между двойки пресечни точки
+    for (let i = 0; i < intersections.length; i += 2) {
+      if (intersections[i + 1] !== undefined) {
+        ctx.beginPath();
+        ctx.moveTo(intersections[i], y);
+        ctx.lineTo(intersections[i + 1], y);
+        ctx.strokeStyle = "gray";
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+// Алгоритъм на мехурчето
+function bubbleSort(arr) {
+  const N = arr.length;
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        // размяна
+        const temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+}
+</script>
+
+</body>
+</html>
+

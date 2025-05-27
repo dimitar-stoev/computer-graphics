@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Брезенхам и Мащабиране</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Задаване на начална и крайна точка за линията
+        let x0 = 100, y0 = 200;
+        let x1 = 300, y1 = 200;
+
+        // Коефициент на мащабиране
+        let K = 1.5; // Например, 1.5 пъти увеличение
+
+        // Изчертаване на оригиналната линия (черна)
+        ctx.fillStyle = 'black';
+        bresenhamLine(x0, y0, x1, y1);
+
+        // Мащабиране на точките
+        let scaledPoints = scaleLine(x0, y0, x1, y1, K);
+
+        // Изчертаване на мащабираната линия (червена)
+        ctx.fillStyle = 'red';
+        bresenhamLine(scaledPoints.x0, scaledPoints.y0, scaledPoints.x1, scaledPoints.y1);
+
+        // Алгоритъм на Брезенхам за изчертаване на линия
+        function bresenhamLine(x0, y0, x1, y1) {
+            x0 = Math.round(x0);
+            y0 = Math.round(y0);
+            x1 = Math.round(x1);
+            y1 = Math.round(y1);
+
+            let dx = Math.abs(x1 - x0);
+            let dy = Math.abs(y1 - y0);
+            let sx = x0 < x1 ? 1 : -1;
+            let sy = y0 < y1 ? 1 : -1;
+            let err = dx - dy;
+
+            while (true) {
+                ctx.fillRect(x0, y0, 1, 1); // Изчертаване на точка
+                if (x0 === x1 && y0 === y1) break;
+                let e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        // Функция за мащабиране на линия
+        function scaleLine(x0, y0, x1, y1, K) {
+            // Център на линията (точка, спрямо която ще се мащабира)
+            let cx = (x0 + x1) / 2;
+            let cy = (y0 + y1) / 2;
+
+            // Уравнение на отсечка: преместване спрямо центъра, мащабиране и връщане
+            let x0_new = cx + K * (x0 - cx);
+            let y0_new = cy + K * (y0 - cy);
+            let x1_new = cx + K * (x1 - cx);
+            let y1_new = cy + K * (y1 - cy);
+
+            return {
+                x0: x0_new,
+                y0: y0_new,
+                x1: x1_new,
+                y1: y1_new
+            };
+        }
+    </script>
+</body>
+</html>

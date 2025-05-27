@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Окръжност с Брезенхам и транслация</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Настройки за цветове и стил
+        ctx.fillStyle = "red"; // Оригинална окръжност
+        ctx.fillStyle = "blue"; // Транслирана окръжност
+
+        // Функция за изчертаване на един пиксел
+        function drawPixel(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.rect(x, y, 1, 1);
+            ctx.fill();
+        }
+
+        // Функция за изчертаване на окръжност с алгоритъма на Брезенхам
+        function drawBresenhamCircle(xc, yc, r, color) {
+            let x = 0;
+            let y = r;
+            let d = 3 - 2 * r; // Начален параметър на решение
+
+            while (x <= y) {
+                // Изчертаване на пиксели във всички 8 октанта
+                drawPixel(xc + x, yc + y, color);
+                drawPixel(xc - x, yc + y, color);
+                drawPixel(xc + x, yc - y, color);
+                drawPixel(xc - x, yc - y, color);
+                drawPixel(xc + y, yc + x, color);
+                drawPixel(xc - y, yc + x, color);
+                drawPixel(xc + y, yc - x, color);
+                drawPixel(xc - y, yc - x, color);
+
+                // Актуализиране на параметъра и координатите
+                if (d < 0) {
+                    d = d + 4 * x + 6;
+                } else {
+                    d = d + 4 * (x - y) + 10;
+                    y--;
+                }
+                x++;
+            }
+        }
+
+        // Функция за транслация на окръжност
+        function translateCircle(xc, yc, r, m, n) {
+            const newXc = xc + m;
+            const newYc = yc + n;
+            return { xc: newXc, yc: newYc, r: r };
+        }
+
+        // Примерни стойности
+        const xc = 150, yc = 150; // Център на окръжността
+        const r = 50; // Радиус
+        const translationVector = { m: 70, n: 40 }; // Вектор на транслация (M, N)
+
+        // Изчертаване на оригиналната окръжност
+        drawBresenhamCircle(xc, yc, r, "red");
+
+        // Транслиране и изчертаване на новата окръжност
+        const translated = translateCircle(xc, yc, r, translationVector.m, translationVector.n);
+        drawBresenhamCircle(translated.xc, translated.yc, translated.r, "blue");
+    </script>
+</body>
+</html>

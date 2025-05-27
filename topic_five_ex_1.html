@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Bresenham Line Algorithm</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <script>
+        // Получаване на canvas и контекста
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+
+        // Дефиниране на масив за съхранение на точките
+        var points = new Array();
+        
+        // Реализация на алгоритъма на Брезенхам
+        function bresenhamLine(x0, y0, x1, y1) {
+            // Инициализация на масива
+            points.push({x: x0, y: y0}); // Добавяне на първата точка по подобие на а.push(X)
+            points[0] = {x: x0, y: y0}; // Задаване на първия елемент по подобие на а[0]=X
+
+            var dx = Math.abs(x1 - x0);
+            var dy = Math.abs(y1 - y0);
+            var sx = (x0 < x1) ? 1 : -1;
+            var sy = (y0 < y1) ? 1 : -1;
+            var err = dx - dy;
+
+            while (true) {
+                // Добавяне на текущата точка в масива
+                points.push({x: x0, y: y0});
+                
+                // Рисуване на пиксел
+                ctx.fillRect(x0, y0, 1, 1);
+
+                if (x0 === x1 && y0 === y1) break;
+                var e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        // Изчистване на canvas и рисуване на отсечка
+        ctx.fillStyle = "black";
+        bresenhamLine(50, 50, 350, 350); // Примерна отсечка от (50,50) до (350,350)
+
+        // Извеждане на точките в конзолата за проверка
+        console.log("Points in the line:", points);
+    </script>
+</body>
+</html>

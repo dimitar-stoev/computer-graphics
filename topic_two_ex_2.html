@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Окръжност с алгоритъма на Брезенхам</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Настройки за цветове и стил
+        ctx.fillStyle = "red";
+
+        // Функция за изчертаване на един пиксел
+        function drawPixel(x, y) {
+            ctx.beginPath();
+            ctx.rect(x, y, 1, 1);
+            ctx.fill();
+        }
+
+        // Функция за изчертаване на окръжност с алгоритъма на Брезенхам
+        function drawBresenhamCircle(xc, yc, r) {
+            let x = 0;
+            let y = r;
+            let d = 3 - 2 * r; // Начален параметър на решение
+
+            // Изчертаване на първоначалните точки и тяхната симетрия
+            while (x <= y) {
+                // Изчертаване на пиксели във всички 8 октанта
+                drawPixel(xc + x, yc + y);
+                drawPixel(xc - x, yc + y);
+                drawPixel(xc + x, yc - y);
+                drawPixel(xc - x, yc - y);
+                drawPixel(xc + y, yc + x);
+                drawPixel(xc - y, yc + x);
+                drawPixel(xc + y, yc - x);
+                drawPixel(xc - y, yc - x);
+
+                // Актуализиране на параметъра и координатите
+                if (d < 0) {
+                    d = d + 4 * x + 6;
+                } else {
+                    d = d + 4 * (x - y) + 10;
+                    y--;
+                }
+                x++;
+            }
+        }
+
+        drawBresenhamCircle(200, 200, 50);
+    </script>
+</body>
+</html>

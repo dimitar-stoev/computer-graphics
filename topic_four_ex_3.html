@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Брезенхам и Ротация</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Задаване на начална и крайна точка за линията
+        let x0 = 100, y0 = 200;
+        let x1 = 300, y1 = 200;
+
+        // Ъгъл на ротация в градуси (например 45°)
+        let angleDeg = 45;
+        // Преобразуване в радиани
+        let angleRad = angleDeg * Math.PI / 180;
+
+        // Изчертаване на оригиналната линия (черна)
+        ctx.fillStyle = 'black';
+        bresenhamLine(x0, y0, x1, y1);
+
+        // Ротация на точките
+        let rotatedPoints = rotateLine(x0, y0, x1, y1, angleRad);
+
+        // Изчертаване на ротираната линия (червена)
+        ctx.fillStyle = 'red';
+        bresenhamLine(rotatedPoints.x0, rotatedPoints.y0, rotatedPoints.x1, rotatedPoints.y1);
+
+        // Алгоритъм на Брезенхам за изчертаване на линия
+        function bresenhamLine(x0, y0, x1, y1) {
+            x0 = Math.round(x0);
+            y0 = Math.round(y0);
+            x1 = Math.round(x1);
+            y1 = Math.round(y1);
+
+            let dx = Math.abs(x1 - x0);
+            let dy = Math.abs(y1 - y0);
+            let sx = x0 < x1 ? 1 : -1;
+            let sy = y0 < y1 ? 1 : -1;
+            let err = dx - dy;
+
+            while (true) {
+                ctx.fillRect(x0, y0, 1, 1); // Изчертаване на точка
+                if (x0 === x1 && y0 === y1) break;
+                let e2 = 2 * err;
+                if (e2 > -dy) {
+                    err -= dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
+        }
+
+        // Функция за ротация на линия
+        function rotateLine(x0, y0, x1, y1, angle) {
+            // Център на ротация (средата на линията)
+            let cx = (x0 + x1) / 2;
+            let cy = (y0 + y1) / 2;
+
+            // Преместване на точките спрямо центъра
+            let x0_rel = x0 - cx;
+            let y0_rel = y0 - cy;
+            let x1_rel = x1 - cx;
+            let y1_rel = y1 - cy;
+
+            // Прилагане на формулите за ротация
+            let x0_new = x0_rel * Math.cos(angle) - y0_rel * Math.sin(angle);
+            let y0_new = x0_rel * Math.sin(angle) + y0_rel * Math.cos(angle);
+            let x1_new = x1_rel * Math.cos(angle) - y1_rel * Math.sin(angle);
+            let y1_new = x1_rel * Math.sin(angle) + y1_rel * Math.cos(angle);
+
+            // Връщане на координатите към първоначалната позиция
+            return {
+                x0: x0_new + cx,
+                y0: y0_new + cy,
+                x1: x1_new + cx,
+                y1: y1_new + cy
+            };
+        }
+    </script>
+</body>
+</html>
